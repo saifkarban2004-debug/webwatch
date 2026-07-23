@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma';
 import {
   getTMDBImageUrl,
@@ -11,6 +9,8 @@ import {
   getTopRatedMovies,
   getTopRatedTV,
 } from '@/lib/tmdb';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

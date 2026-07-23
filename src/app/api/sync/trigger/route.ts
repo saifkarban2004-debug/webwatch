@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { syncTrending, syncPopular, syncTopRated } from '@/workers/media-sync.worker';
 
 export const dynamic = 'force-dynamic';
 
