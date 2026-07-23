@@ -49,6 +49,8 @@ interface EpisodeInfo {
   runtime: number | null;
 }
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: WatchPageProps): Promise<Metadata> {
   const { type, id } = params;
   let title = 'Watch on WebWatch';

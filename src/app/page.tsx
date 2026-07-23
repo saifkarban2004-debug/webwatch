@@ -16,6 +16,8 @@ export const metadata = {
   description: 'Watch your favorite movies and TV shows online for free.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   let trendingMovies: any[] = [];
   let trendingTV: any[] = [];
