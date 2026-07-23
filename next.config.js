@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['bullmq', '@valkey/valkey-glide'],
+  webpack: (config) => {
+    config.externals.push('@valkey/valkey-glide');
+    return config;
+  },
   images: {
     remotePatterns: [
       {
