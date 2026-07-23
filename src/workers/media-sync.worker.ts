@@ -5,7 +5,6 @@
  */
 
 import { Worker, Job } from 'bullmq';
-import { PrismaClient } from '@prisma/client';
 import {
   getTrendingMovies,
   getTrendingTV,
@@ -21,8 +20,7 @@ import {
   type TMDBCastMember,
 } from '../lib/tmdb';
 import { createRedisConnection } from '../lib/queue';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ─── Job Processor ───────────────────────────────────────────────────────────
 
@@ -471,7 +469,7 @@ function sleep(ms: number): Promise<void> {
 let worker: Worker | null = null;
 let connection: ReturnType<typeof createRedisConnection> | null = null;
 
-if (!process.env.DISABLE_BULLMQ) {
+if (process.env.ENABLE_WORKER === 'true') {
   connection = createRedisConnection();
   worker = new Worker('media-sync', processJob, {
     connection,
