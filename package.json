@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "3": "^2.1.0",
+    "@prisma/client": "^5.22.0",
+    "bullmq": "^5.81.0",
+    "ioredis": "^5.11.1",
+    "next": "14.2.35",
+    "prisma": "^5.22.0",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.35"
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.35"
+    "eslint-config-next": "14.2.35",
+    "typescript": "^5"
   }
 }
