@@ -34,6 +34,8 @@ export default async function TVShowsPage() {
     'Sci-Fi & Fantasy': 'Sci-Fi & Fantasy'
   };
 
+  let useTMDB = false;
+
   try {
     const dbShows = await prisma.tVShow.findMany({
       orderBy: { popularity: 'desc' },
@@ -56,7 +58,15 @@ export default async function TVShowsPage() {
         type: 'tv'
       }));
     } else {
-      // Fallback to TMDB API if DB is empty
+      useTMDB = true;
+    }
+  } catch (error) {
+    console.error('Error fetching TV shows from DB, falling back to TMDB:', error);
+    useTMDB = true;
+  }
+
+  if (useTMDB) {
+    try {
       const { getPopularTV } = await import('@/lib/tmdb');
       const pages = await Promise.all([
         getPopularTV(1),
@@ -73,9 +83,9 @@ export default async function TVShowsPage() {
         genres: s.genre_ids ? s.genre_ids.map((id: number) => GENRE_MAP[id.toString()] || id.toString()) : [],
         type: 'tv'
       }));
+    } catch (apiError) {
+      console.error('TMDB API fallback failed:', apiError);
     }
-  } catch (error) {
-    console.error('Error fetching TV shows:', error);
   }
 
   return (

@@ -35,6 +35,8 @@ export default async function MoviesPage() {
     'Science Fiction': 'Sci-Fi'
   };
 
+  let useTMDB = false;
+
   try {
     const dbMovies = await prisma.movie.findMany({
       orderBy: { popularity: 'desc' },
@@ -57,7 +59,15 @@ export default async function MoviesPage() {
         type: 'movie'
       }));
     } else {
-      // Fallback to TMDB API if DB is empty
+      useTMDB = true;
+    }
+  } catch (error) {
+    console.error('Error fetching movies from DB, falling back to TMDB:', error);
+    useTMDB = true;
+  }
+
+  if (useTMDB) {
+    try {
       const { getPopularMovies } = await import('@/lib/tmdb');
       const pages = await Promise.all([
         getPopularMovies(1),
@@ -74,9 +84,9 @@ export default async function MoviesPage() {
         genres: m.genre_ids ? m.genre_ids.map((id: number) => GENRE_MAP[id.toString()] || id.toString()) : [],
         type: 'movie'
       }));
+    } catch (apiError) {
+      console.error('TMDB API fallback failed:', apiError);
     }
-  } catch (error) {
-    console.error('Error fetching movies:', error);
   }
 
   return (

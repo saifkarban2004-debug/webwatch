@@ -19,16 +19,22 @@ export async function GET(request: NextRequest) {
     const searchQ = query.trim();
 
     // 1. Search local DB first
-    const [dbMovies, dbTV] = await Promise.all([
-      prisma.movie.findMany({
-        where: { title: { contains: searchQ, mode: 'insensitive' } },
-        take: 10
-      }),
-      prisma.tVShow.findMany({
-        where: { name: { contains: searchQ, mode: 'insensitive' } },
-        take: 10
-      })
-    ]);
+    let dbMovies: any[] = [];
+    let dbTV: any[] = [];
+    try {
+      [dbMovies, dbTV] = await Promise.all([
+        prisma.movie.findMany({
+          where: { title: { contains: searchQ, mode: 'insensitive' } },
+          take: 10
+        }),
+        prisma.tVShow.findMany({
+          where: { name: { contains: searchQ, mode: 'insensitive' } },
+          take: 10
+        })
+      ]);
+    } catch (dbError) {
+      console.error('Search DB query failed, skipping to TMDB:', dbError);
+    }
 
     const results: any[] = [];
     const seenIds = new Set<string>();
