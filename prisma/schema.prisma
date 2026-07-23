@@ -1,0 +1,184 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum MediaType {
+  MOVIE
+  TV
+}
+
+model Movie {
+  id            String       @id @default(uuid())
+  tmdbId        Int          @unique
+  imdbId        String?      @unique
+  title         String
+  originalTitle String?
+  overview      String?      @db.Text
+  tagline       String?
+  posterPath    String?
+  backdropPath  String?
+  releaseDate   DateTime?
+  runtime       Int?
+  voteAverage   Float        @default(0.0)
+  voteCount     Int          @default(0)
+  popularity    Float        @default(0.0)
+  status        String?
+  language      String?      @default("en")
+  adult         Boolean      @default(false)
+  budget        BigInt?
+  revenue       BigInt?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  genres        MovieGenre[]
+  cast          MovieCast[]
+
+  @@index([tmdbId])
+  @@index([popularity(sort: Desc)])
+  @@index([releaseDate(sort: Desc)])
+  @@index([voteAverage(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
+
+model TVShow {
+  id              String       @id @default(uuid())
+  tmdbId          Int          @unique
+  name            String
+  originalName    String?
+  overview        String?      @db.Text
+  tagline         String?
+  posterPath      String?
+  backdropPath    String?
+  firstAirDate    DateTime?
+  lastAirDate     DateTime?
+  voteAverage     Float        @default(0.0)
+  voteCount       Int          @default(0)
+  popularity      Float        @default(0.0)
+  status          String?
+  numberOfSeasons Int?
+  numberOfEpisodes Int?
+  language        String?      @default("en")
+  inProduction    Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  seasons         Season[]
+  genres          TVShowGenre[]
+  cast            TVShowCast[]
+
+  @@index([tmdbId])
+  @@index([popularity(sort: Desc)])
+  @@index([firstAirDate(sort: Desc)])
+  @@index([voteAverage(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
+
+model Season {
+  id           String    @id @default(uuid())
+  tmdbId       Int?      @unique
+  seasonNumber Int
+  name         String
+  overview     String?   @db.Text
+  posterPath   String?
+  airDate      DateTime?
+  episodeCount Int?
+
+  tvShowId     String
+  tvShow       TVShow    @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+  episodes     Episode[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([tvShowId, seasonNumber])
+  @@index([tvShowId])
+}
+
+model Episode {
+  id            String    @id @default(uuid())
+  tmdbId        Int?      @unique
+  episodeNumber Int
+  name          String
+  overview      String?   @db.Text
+  stillPath     String?
+  airDate       DateTime?
+  runtime       Int?
+  voteAverage   Float     @default(0.0)
+  voteCount     Int       @default(0)
+
+  seasonId      String
+  season        Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([seasonId, episodeNumber])
+  @@index([seasonId])
+}
+
+model Genre {
+  id     String       @id @default(uuid())
+  tmdbId Int          @unique
+  name   String       @unique
+
+  movies MovieGenre[]
+  tv     TVShowGenre[]
+}
+
+model Person {
+  id          String       @id @default(uuid())
+  tmdbId      Int          @unique
+  name        String
+  profilePath String?
+
+  movies      MovieCast[]
+  tv          TVShowCast[]
+
+  @@index([tmdbId])
+}
+
+// Junction Tables
+model MovieGenre {
+  movieId String
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genreId String
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+}
+
+model TVShowGenre {
+  tvShowId String
+  tvShow   TVShow @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+  genreId  String
+  genre    Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([tvShowId, genreId])
+}
+
+model MovieCast {
+  movieId   String
+  movie     Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  personId  String
+  person    Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  character String?
+  castOrder Int    @default(0)
+
+  @@id([movieId, personId])
+}
+
+model TVShowCast {
+  tvShowId  String
+  tvShow    TVShow @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+  personId  String
+  person    Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  character String?
+  castOrder Int    @default(0)
+
+  @@id([tvShowId, personId])
+}
