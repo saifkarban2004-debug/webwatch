@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { syncTrending, syncPopular, syncTopRated } from '@/workers/media-sync.worker';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function POST(request: NextRequest) {
+  headers();
   try {
     // Optional basic auth check using headers
     const adminKey = request.headers.get('x-admin-key');
