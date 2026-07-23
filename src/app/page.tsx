@@ -110,11 +110,11 @@ export default async function HomePage() {
       <div style={{ marginTop: '-40px', position: 'relative', zIndex: 10 }}>
         {WatchHistory && <WatchHistory />}
 
-        <MediaRail title="Trending Movies" items={trendingMovies} viewAllHref="/movies/trending" />
-        <MediaRail title="Trending TV Shows" items={trendingTV} viewAllHref="/tv/trending" />
-        <MediaRail title="Popular Movies" items={popularMovies} viewAllHref="/movies/popular" />
-        <MediaRail title="Top Rated Movies" items={topRatedMovies} viewAllHref="/movies/top-rated" />
-        <MediaRail title="Top Rated TV Shows" items={topRatedTV} viewAllHref="/tv/top-rated" />
+        <MediaRail title="Trending Movies" items={trendingMovies} viewAllHref="/movies" />
+        <MediaRail title="Trending TV Shows" items={trendingTV} viewAllHref="/tv" />
+        <MediaRail title="Popular Movies" items={popularMovies} viewAllHref="/movies" />
+        <MediaRail title="Top Rated Movies" items={topRatedMovies} viewAllHref="/movies" />
+        <MediaRail title="Top Rated TV Shows" items={topRatedTV} viewAllHref="/tv" />
       </div>
     </div>
   );
