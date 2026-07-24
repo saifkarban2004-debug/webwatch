@@ -208,10 +208,19 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <div className="flex flex-col gap-8">
-        <div className={`flex flex-col lg:flex-row gap-8 items-start`}>
+      <div style={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+      }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: roomId ? '1fr 350px' : '1fr', 
+          gap: '2rem',
+          alignItems: 'start'
+        }}>
           {/* Main Player Area */}
-          <div className="w-full lg:flex-1 min-w-0">
+          <div style={{ width: '100%', minWidth: 0 }}>
             <WatchPlayer
               servers={servers}
               title={metadata.title}
@@ -251,7 +260,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
 
           {/* Watch Party Sidebar */}
           {roomId && (
-            <div className="w-full lg:w-[350px] h-[600px] lg:sticky lg:top-8 z-40 bg-[#1a1a24] rounded-xl overflow-hidden shadow-2xl">
+            <div style={{ height: '600px', position: 'sticky', top: '2rem' }}>
               <WatchPartyClient roomId={roomId} />
             </div>
           )}
