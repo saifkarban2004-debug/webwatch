@@ -22,6 +22,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
   const [userName, setUserName] = useState('');
   const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<any>(null);
 
   // Generate a random name if not set
   useEffect(() => {
@@ -44,6 +45,8 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
         },
       },
     });
+    
+    channelRef.current = room;
 
     // Listen for Presence state changes (users joining/leaving)
     room
@@ -78,7 +81,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !supabase) return;
+    if (!newMessage.trim() || !channelRef.current) return;
 
     const msg: Message = {
       id: Math.random().toString(36).substring(7),
@@ -91,8 +94,8 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
     setMessages((prev) => [...prev, msg]);
     setNewMessage('');
 
-    // Broadcast to others in the room
-    await supabase.channel(`room_${roomId}`).send({
+    // Broadcast to others in the room using the established channel instance
+    await channelRef.current.send({
       type: 'broadcast',
       event: 'chat',
       payload: msg,
