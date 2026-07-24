@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,6 +36,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
+        <Script 
+          src="https://quge5.com/88/tag.min.js" 
+          data-zone="263344" 
+          data-cfasync="false" 
+          strategy="afterInteractive" 
+        />
         <Navbar />
         <main className="main-content">
           {children}
