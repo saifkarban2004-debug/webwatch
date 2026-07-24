@@ -125,7 +125,7 @@ export default function HeroBanner({ items }: HeroBannerProps) {
                 }}>
                   ▶ Watch Now
                 </Link>
-                <Link href={`/info/${item.type}/${item.tmdbId}`} style={{
+                <Link href={`/watch/${item.type}/${item.tmdbId}`} style={{
                   backgroundColor: 'rgba(255,255,255,0.2)',
                   color: '#fff',
                   padding: '12px 24px',
