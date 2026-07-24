@@ -78,7 +78,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !supabase) return;
 
     const msg: Message = {
       id: Math.random().toString(36).substring(7),
