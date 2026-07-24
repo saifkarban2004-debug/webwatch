@@ -9,6 +9,8 @@ import {
   getPopularTV,
   getTopRatedMovies,
   getTopRatedTV,
+  discoverMoviesByGenre,
+  discoverTVByGenre,
 } from '@/lib/tmdb';
 
 export const dynamic = 'force-dynamic';
@@ -22,6 +24,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || 'trending';
     const type = searchParams.get('type') || 'movie';
     const page = parseInt(searchParams.get('page') || '1', 10);
+    const genreId = searchParams.get('genre') || null; // TMDB genre ID
     const limit = 20;
     const skip = (page - 1) * limit;
 
@@ -31,6 +34,43 @@ export async function GET(request: NextRequest) {
 
     let results: any[] = [];
     let totalResults = 0;
+
+    // ─── Genre-specific discovery via TMDB ────────────────────────────
+    if (genreId) {
+      try {
+        let tmdbData: any = null;
+        if (type === 'movie') {
+          tmdbData = await discoverMoviesByGenre(parseInt(genreId, 10), page);
+        } else {
+          tmdbData = await discoverTVByGenre(parseInt(genreId, 10), page);
+        }
+
+        if (tmdbData?.results) {
+          results = tmdbData.results.map((item: any) => ({
+            tmdbId: item.id,
+            title: item.title || item.name,
+            type,
+            posterPath: getTMDBImageUrl(item.poster_path, 'poster'),
+            year: (item.release_date || item.first_air_date || '').split('-')[0],
+            voteAverage: item.vote_average,
+            overview: item.overview,
+            genres: [],
+          }));
+          totalResults = tmdbData.total_results || results.length;
+        }
+      } catch (err) {
+        console.warn('TMDB genre discover failed:', err);
+      }
+
+      return NextResponse.json({
+        results,
+        page,
+        totalPages: Math.ceil(totalResults / limit),
+        totalResults,
+      });
+    }
+
+    // ─── Standard browsing (no genre filter) ──────────────────────────
 
     const orderObj =
       category === 'top_rated'

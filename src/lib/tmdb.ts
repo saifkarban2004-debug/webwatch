@@ -276,3 +276,23 @@ export async function searchMulti(
     language: 'en-US',
   });
 }
+
+/** Discover movies by genre */
+export async function discoverMoviesByGenre(genreId: number, page = 1): Promise<TMDBPaginatedResponse<TMDBMovie>> {
+  return tmdbFetch<TMDBPaginatedResponse<TMDBMovie>>('/discover/movie', {
+    with_genres: String(genreId),
+    sort_by: 'popularity.desc',
+    page: String(page),
+    language: 'en-US',
+  });
+}
+
+/** Discover TV shows by genre */
+export async function discoverTVByGenre(genreId: number, page = 1): Promise<TMDBPaginatedResponse<TMDBTVShow>> {
+  return tmdbFetch<TMDBPaginatedResponse<TMDBTVShow>>('/discover/tv', {
+    with_genres: String(genreId),
+    sort_by: 'popularity.desc',
+    page: String(page),
+    language: 'en-US',
+  });
+}
