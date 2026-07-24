@@ -22,12 +22,34 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
   const [userName, setUserName] = useState('');
   const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const channelRef = useRef<any>(null);
 
   // Generate a random name if not set
   useEffect(() => {
     setUserName(`User-${Math.floor(Math.random() * 10000)}`);
   }, []);
+
+  // Fetch initial messages
+  useEffect(() => {
+    if (!supabase) return;
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('watch_party_messages')
+        .select('*')
+        .eq('room_id', roomId)
+        .order('created_at', { ascending: true })
+        .limit(50);
+        
+      if (!error && data) {
+        setMessages(data.map(m => ({
+          id: m.id,
+          user: m.user_name,
+          text: m.message,
+          timestamp: new Date(m.created_at).getTime()
+        })));
+      }
+    };
+    fetchMessages();
+  }, [roomId, supabase]);
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -45,8 +67,6 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
         },
       },
     });
-    
-    channelRef.current = room;
 
     // Listen for Presence state changes (users joining/leaving)
     room
@@ -55,16 +75,26 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
         const activeUsers = Object.keys(state).length;
         setUsersCount(activeUsers > 0 ? activeUsers : 1);
       })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-        // Optional: show system message "User X joined"
-      })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-        // Optional: show system message "User X left"
-      });
+      .on('presence', { event: 'join' }, ({ key, newPresences }) => {})
+      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {});
 
-    // Listen for broadcast chat messages
-    room.on('broadcast', { event: 'chat' }, (payload) => {
-      setMessages((prev) => [...prev, payload.payload as Message]);
+    // Listen for database inserts
+    room.on('postgres_changes', { 
+      event: 'INSERT', 
+      schema: 'public', 
+      table: 'watch_party_messages',
+      filter: `room_id=eq.${roomId}`
+    }, (payload) => {
+      const newMsg = payload.new as any;
+      setMessages((prev) => {
+        if (prev.some(m => m.id === newMsg.id)) return prev;
+        return [...prev, {
+          id: newMsg.id,
+          user: newMsg.user_name,
+          text: newMsg.message,
+          timestamp: new Date(newMsg.created_at).getTime()
+        }];
+      });
     });
 
     // Subscribe to the channel
@@ -77,28 +107,20 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
     return () => {
       supabase.removeChannel(room);
     };
-  }, [roomId, userName]);
+  }, [roomId, userName, supabase]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !channelRef.current) return;
+    if (!newMessage.trim() || !supabase) return;
 
-    const msg: Message = {
-      id: Math.random().toString(36).substring(7),
-      user: userName,
-      text: newMessage.trim(),
-      timestamp: Date.now(),
-    };
-
-    // Optimistically add to our own UI
-    setMessages((prev) => [...prev, msg]);
+    const text = newMessage.trim();
     setNewMessage('');
 
-    // Broadcast to others in the room using the established channel instance
-    await channelRef.current.send({
-      type: 'broadcast',
-      event: 'chat',
-      payload: msg,
+    // Insert into Postgres (Realtime listener will pick it up and update UI)
+    await supabase.from('watch_party_messages').insert({
+      room_id: roomId,
+      user_name: userName,
+      message: text
     });
   };
 
