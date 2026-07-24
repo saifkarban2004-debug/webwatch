@@ -27,7 +27,28 @@ interface ProviderConfig {
 
 const PROVIDERS: ProviderConfig[] = [
   {
-    name: 'AutoEmbed (CC)',
+    name: 'VidLink (Primary)',
+    key: 'vidlink',
+    buildUrl: ({ tmdbId, type, season, episode }) => {
+      const options = '?primaryColor=6366f1&autoplay=false';
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}${options}`;
+      }
+      return `https://vidlink.pro/movie/${tmdbId}${options}`;
+    },
+  },
+  {
+    name: 'VidBinge',
+    key: 'vidbinge',
+    buildUrl: ({ tmdbId, type, season, episode }) => {
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return `https://vidbinge.dev/embed/tv/${tmdbId}/${season}/${episode}`;
+      }
+      return `https://vidbinge.dev/embed/movie/${tmdbId}`;
+    },
+  },
+  {
+    name: 'AutoEmbed',
     key: 'autoembed',
     buildUrl: ({ tmdbId, type, season, episode }) => {
       if (type === 'tv' && season !== undefined && episode !== undefined) {
@@ -37,53 +58,24 @@ const PROVIDERS: ProviderConfig[] = [
     },
   },
   {
-    name: 'VidSrc PRO',
-    key: 'vidsrcpro',
+    name: 'MultiEmbed',
+    key: 'multiembed',
     buildUrl: ({ tmdbId, type, season, episode }) => {
+      const base = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
       if (type === 'tv' && season !== undefined && episode !== undefined) {
-        return `https://vidsrc.pro/embed/tv/${tmdbId}/${season}/${episode}`;
+        return `${base}&s=${season}&e=${episode}`;
       }
-      return `https://vidsrc.pro/embed/movie/${tmdbId}`;
+      return base;
     },
   },
   {
-    name: 'VidSrc CC',
-    key: 'vidsrccc',
-    buildUrl: ({ tmdbId, type, season, episode }) => {
-      if (type === 'tv' && season !== undefined && episode !== undefined) {
-        return `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
-      }
-      return `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
-    },
-  },
-  {
-    name: 'VidSrc Net',
+    name: 'VidSrc',
     key: 'vidsrc',
     buildUrl: ({ tmdbId, type, season, episode }) => {
       if (type === 'tv' && season !== undefined && episode !== undefined) {
         return `https://vidsrc.net/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}`;
       }
       return `https://vidsrc.net/embed/movie?tmdb=${tmdbId}`;
-    },
-  },
-  {
-    name: 'EmbedSU',
-    key: 'embedsu',
-    buildUrl: ({ tmdbId, type, season, episode }) => {
-      if (type === 'tv' && season !== undefined && episode !== undefined) {
-        return `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
-      }
-      return `https://embed.su/embed/movie/${tmdbId}`;
-    },
-  },
-  {
-    name: 'VidLink',
-    key: 'vidlink',
-    buildUrl: ({ tmdbId, type, season, episode }) => {
-      if (type === 'tv' && season !== undefined && episode !== undefined) {
-        return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`;
-      }
-      return `https://vidlink.pro/movie/${tmdbId}`;
     },
   },
 ];
