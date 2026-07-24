@@ -88,11 +88,14 @@ export async function generateMetadata({ params }: WatchPageProps): Promise<Meta
   };
 }
 
+import WatchPartyClient from '@/components/WatchPartyClient';
+
 export default async function WatchPage({ params, searchParams }: WatchPageProps) {
   const { type, id } = params;
   const tmdbId = Number(id);
   const seasonNum = searchParams.season ? Number(searchParams.season) : 1;
   const episodeNum = searchParams.episode ? Number(searchParams.episode) : 1;
+  const roomId = searchParams.room ? String(searchParams.room) : null;
 
   let servers: ServerInfo[] = [];
   let metadata: MediaMetadata | null = null;
@@ -204,18 +207,67 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <WatchPlayer
-        servers={servers}
-        title={metadata.title}
-        type={metadata.type}
-        tmdbId={metadata.tmdbId}
-        season={currentSeason}
-        episode={currentEpisode}
-        posterPath={metadata.posterPath}
-        backdropPath={metadata.backdropPath}
-        year={metadata.type === 'movie' ? metadata.releaseDate?.substring(0,4) : metadata.firstAirDate?.substring(0,4)}
-      />
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <div style={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+      }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: roomId ? '1fr 350px' : '1fr', 
+          gap: '2rem',
+          alignItems: 'start'
+        }}>
+          {/* Main Player Area */}
+          <div style={{ width: '100%', minWidth: 0 }}>
+            <WatchPlayer
+              servers={servers}
+              title={metadata.title}
+              type={metadata.type}
+              tmdbId={metadata.tmdbId}
+              season={currentSeason}
+              episode={currentEpisode}
+              posterPath={metadata.posterPath}
+              backdropPath={metadata.backdropPath}
+              year={metadata.type === 'movie' ? metadata.releaseDate?.substring(0,4) : metadata.firstAirDate?.substring(0,4)}
+            />
+            
+            {/* Create Party Button */}
+            {!roomId && (
+              <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <a 
+                  href={`?room=${Math.random().toString(36).substring(2, 10)}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    backgroundColor: 'var(--accent)',
+                    color: '#fff',
+                    padding: '0.6rem 1.2rem',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    transition: 'opacity 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+                  onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  Create Watch Party
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Watch Party Sidebar */}
+          {roomId && (
+            <div style={{ height: '600px', position: 'sticky', top: '2rem' }}>
+              <WatchPartyClient roomId={roomId} />
+            </div>
+          )}
+        </div>
+      </div>
 
       <div style={{ marginTop: '2rem' }}>
         <MediaDetails metadata={metadata} />
