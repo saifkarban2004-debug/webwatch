@@ -55,6 +55,7 @@ export async function GET(
           voteCount: tmdbMovie.vote_count,
           genres: tmdbMovie.genres?.map((g: any) => g.name) || [],
           cast: tmdbMovie.credits?.cast?.slice(0, 10).map((c: any) => ({
+            id: c.id,
             name: c.name,
             character: c.character,
             profilePath: getTMDBImageUrl(c.profile_path, 'profile')
@@ -76,6 +77,7 @@ export async function GET(
           voteCount: dbMovie.voteCount,
           genres: dbMovie.genres.map((g: any) => g.genre.name),
           cast: dbMovie.cast.slice(0, 10).map((c: any) => ({
+            id: c.person.tmdbId || c.person.id,
             name: c.person.name,
             character: c.character,
             profilePath: getTMDBImageUrl(c.person.profilePath, 'profile')
@@ -111,6 +113,7 @@ export async function GET(
           voteCount: tmdbTV.vote_count,
           genres: tmdbTV.genres?.map((g: any) => g.name) || [],
           cast: tmdbTV.credits?.cast?.slice(0, 10).map((c: any) => ({
+            id: c.id,
             name: c.name,
             character: c.character,
             profilePath: getTMDBImageUrl(c.profile_path, 'profile')
@@ -151,6 +154,7 @@ export async function GET(
           voteCount: dbTV.voteCount,
           genres: dbTV.genres.map((g: any) => g.genre.name),
           cast: dbTV.cast.slice(0, 10).map((c: any) => ({
+            id: c.person.tmdbId || c.person.id,
             name: c.person.name,
             character: c.character,
             profilePath: getTMDBImageUrl(c.person.profilePath, 'profile')

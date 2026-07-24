@@ -296,3 +296,17 @@ export async function discoverTVByGenre(genreId: number, page = 1): Promise<TMDB
     language: 'en-US',
   });
 }
+
+/** Fetch combined movie & TV credits for a person */
+export async function getPersonCredits(personId: number): Promise<any> {
+  return tmdbFetch<any>(`/person/${personId}/combined_credits`, {
+    language: 'en-US',
+  });
+}
+
+/** Fetch person details */
+export async function getPersonDetails(personId: number): Promise<any> {
+  return tmdbFetch<any>(`/person/${personId}`, {
+    language: 'en-US',
+  });
+}

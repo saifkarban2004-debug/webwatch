@@ -28,7 +28,7 @@ interface MediaMetadata {
   voteAverage: number;
   voteCount?: number;
   genres: string[];
-  cast: { name: string; character: string; profilePath: string }[];
+  cast: { id?: number; name: string; character: string; profilePath: string }[];
   type: 'movie' | 'tv';
   tagline?: string;
   imdbId?: string;
@@ -137,6 +137,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
           voteCount: details.vote_count || 0,
           genres: details.genres?.map((g: any) => g.name) || [],
           cast: details.credits?.cast?.slice(0, 15).map((c: any) => ({
+            id: c.id,
             name: c.name,
             character: c.character,
             profilePath: c.profile_path ? getTMDBImageUrl(c.profile_path, 'profile') : ''
@@ -161,6 +162,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
           voteCount: details.vote_count || 0,
           genres: details.genres?.map((g: any) => g.name) || [],
           cast: details.credits?.cast?.slice(0, 15).map((c: any) => ({
+            id: c.id,
             name: c.name,
             character: c.character,
             profilePath: c.profile_path ? getTMDBImageUrl(c.profile_path, 'profile') : ''
