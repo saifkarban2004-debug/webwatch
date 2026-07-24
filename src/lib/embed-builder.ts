@@ -27,6 +27,36 @@ interface ProviderConfig {
 
 const PROVIDERS: ProviderConfig[] = [
   {
+    name: 'AutoEmbed (CC)',
+    key: 'autoembed',
+    buildUrl: ({ tmdbId, type, season, episode }) => {
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
+      }
+      return `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+    },
+  },
+  {
+    name: 'VidSrc PRO',
+    key: 'vidsrcpro',
+    buildUrl: ({ tmdbId, type, season, episode }) => {
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return `https://vidsrc.pro/embed/tv/${tmdbId}/${season}/${episode}`;
+      }
+      return `https://vidsrc.pro/embed/movie/${tmdbId}`;
+    },
+  },
+  {
+    name: 'VidSrc CC',
+    key: 'vidsrccc',
+    buildUrl: ({ tmdbId, type, season, episode }) => {
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
+      }
+      return `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
+    },
+  },
+  {
     name: 'VidSrc Net',
     key: 'vidsrc',
     buildUrl: ({ tmdbId, type, season, episode }) => {
@@ -54,17 +84,6 @@ const PROVIDERS: ProviderConfig[] = [
         return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`;
       }
       return `https://vidlink.pro/movie/${tmdbId}`;
-    },
-  },
-  {
-    name: 'MultiEmbed',
-    key: 'multiembed',
-    buildUrl: ({ tmdbId, type, season, episode }) => {
-      const base = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-      if (type === 'tv' && season !== undefined && episode !== undefined) {
-        return `${base}&s=${season}&e=${episode}`;
-      }
-      return base;
     },
   },
 ];
