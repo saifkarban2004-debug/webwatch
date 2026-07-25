@@ -28,6 +28,12 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
     setUserName(`User-${Math.floor(Math.random() * 10000)}`);
   }, []);
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   // Fetch initial messages
   useEffect(() => {
     if (!supabase) return;
@@ -46,15 +52,11 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
           text: m.message,
           timestamp: new Date(m.created_at).getTime()
         })));
+        scrollToBottom(); // Scroll once on initial load
       }
     };
     fetchMessages();
   }, [roomId, supabase]);
-
-  // Scroll to bottom on new message
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   useEffect(() => {
     if (!userName || !supabase) return;
@@ -115,6 +117,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
     const text = newMessage.trim();
     setNewMessage('');
+    scrollToBottom(); // Scroll down when explicitly sending a message
 
     // Insert into Postgres (Realtime listener will pick it up and update UI)
     await supabase.from('watch_party_messages').insert({
