@@ -208,52 +208,72 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
-        {/* Main Player Area */}
-        <div className="w-full lg:flex-1 min-w-0">
-          <WatchPlayer
-            servers={servers}
-            title={metadata.title}
-            type={metadata.type}
-            tmdbId={metadata.tmdbId}
-            season={currentSeason}
-            episode={currentEpisode}
-            posterPath={metadata.posterPath}
-            backdropPath={metadata.backdropPath}
-            year={metadata.type === 'movie' ? metadata.releaseDate?.substring(0,4) : metadata.firstAirDate?.substring(0,4)}
-          />
-          
-          {/* Create Party Button */}
-          {!roomId && (
-            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <a 
-                href={`?room=${Math.random().toString(36).substring(2, 10)}`}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  backgroundColor: 'var(--accent)',
-                  color: '#fff',
-                  padding: '0.6rem 1.2rem',
-                  borderRadius: '0.5rem',
-                  textDecoration: 'none',
-                  fontWeight: 'bold',
-                  transition: 'opacity 0.2s'
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Create Watch Party
-              </a>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        .watch-grid {
+          display: grid;
+          gap: 2rem;
+          align-items: start;
+          grid-template-columns: 1fr;
+        }
+        @media (min-width: 1024px) {
+          .watch-grid.has-sidebar {
+            grid-template-columns: 1fr 350px;
+          }
+        }
+      `}} />
+      <div style={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+      }}>
+        <div className={`watch-grid ${roomId ? 'has-sidebar' : ''}`}>
+          {/* Main Player Area */}
+          <div style={{ width: '100%', minWidth: 0 }}>
+            <WatchPlayer
+              servers={servers}
+              title={metadata.title}
+              type={metadata.type}
+              tmdbId={metadata.tmdbId}
+              season={currentSeason}
+              episode={currentEpisode}
+              posterPath={metadata.posterPath}
+              backdropPath={metadata.backdropPath}
+              year={metadata.type === 'movie' ? metadata.releaseDate?.substring(0,4) : metadata.firstAirDate?.substring(0,4)}
+            />
+            
+            {/* Create Party Button */}
+            {!roomId && (
+              <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <a 
+                  href={`?room=${Math.random().toString(36).substring(2, 10)}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    backgroundColor: 'var(--accent)',
+                    color: '#fff',
+                    padding: '0.6rem 1.2rem',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    transition: 'opacity 0.2s'
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  Create Watch Party
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Watch Party Sidebar */}
+          {roomId && (
+            <div style={{ height: '600px', position: 'sticky', top: '2rem' }}>
+              <WatchPartyClient roomId={roomId} />
             </div>
           )}
         </div>
-
-        {/* Watch Party Sidebar */}
-        {roomId && (
-          <div className="w-full lg:w-[350px] h-[600px] lg:sticky lg:top-8 z-40">
-            <WatchPartyClient roomId={roomId} />
-          </div>
-        )}
       </div>
 
       <div style={{ marginTop: '2rem' }}>
