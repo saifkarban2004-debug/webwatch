@@ -208,26 +208,14 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <style dangerouslySetInnerHTML={{__html: `
-        .watch-grid {
-          display: grid;
-          gap: 2rem;
-          align-items: start;
-          grid-template-columns: 1fr;
-        }
-        @media (min-width: 768px) {
-          .watch-grid.has-sidebar {
-            grid-template-columns: 1fr 350px;
-          }
-        }
-      `}} />
       <div style={{ 
         display: 'flex',
         flexDirection: 'column',
         gap: '2rem',
       }}>
-        <div className={`watch-grid ${roomId ? 'has-sidebar' : ''}`}>
+        <div 
+          className={roomId ? "grid grid-cols-1 md:grid-cols-[1fr_350px] gap-8 items-start" : "grid grid-cols-1 gap-8 items-start"}
+        >
           {/* Main Player Area */}
           <div style={{ width: '100%', minWidth: 0 }}>
             <WatchPlayer
