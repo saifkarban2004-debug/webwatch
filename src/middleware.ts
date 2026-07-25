@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
     media-src 'self' blob:;
     frame-src 'self' https://vidsrc.net https://vidlink.pro https://embed.su https://multiembed.mov https://streamingnow.mov https://*.vidsrc.net https://*.vidlink.pro https://*.embed.su https://*.multiembed.mov https://*.streamingnow.mov;
     font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com;
-    connect-src 'self' https://api.themoviedb.org;
+    connect-src 'self' https://api.themoviedb.org https://*.supabase.co wss://*.supabase.co;
   `.replace(/\s{2,}/g, ' ').trim();
 
   response.headers.set('Content-Security-Policy', csp);
