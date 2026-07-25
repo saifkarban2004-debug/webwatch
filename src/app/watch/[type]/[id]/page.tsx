@@ -216,7 +216,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
           align-items: start;
           grid-template-columns: 1fr;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
           .watch-grid.has-sidebar {
             grid-template-columns: 1fr 350px;
           }
