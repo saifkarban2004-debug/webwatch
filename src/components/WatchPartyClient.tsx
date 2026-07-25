@@ -22,6 +22,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
   const [userName, setUserName] = useState('');
   const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Generate a random name if not set
   useEffect(() => {
@@ -30,7 +31,12 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     }, 100);
   };
 
@@ -192,7 +198,9 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       </div>
 
       {/* Chat Messages */}
-      <div style={{
+      <div 
+        ref={chatContainerRef}
+        style={{
         flex: 1,
         padding: '1rem',
         overflowY: 'auto',
