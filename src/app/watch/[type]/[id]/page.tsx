@@ -213,9 +213,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
         flexDirection: 'column',
         gap: '2rem',
       }}>
-        <div 
-          className={roomId ? "grid grid-cols-1 md:grid-cols-[1fr_350px] gap-8 items-start" : "grid grid-cols-1 gap-8 items-start"}
-        >
+        <div className={`watch-grid ${roomId ? 'has-sidebar' : ''}`}>
           {/* Main Player Area */}
           <div style={{ width: '100%', minWidth: 0 }}>
             <WatchPlayer

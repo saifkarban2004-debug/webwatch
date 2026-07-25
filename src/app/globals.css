@@ -413,6 +413,19 @@ img, video, iframe {
   }
 }
 
+/* Watch Party Layout */
+.watch-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .watch-grid.has-sidebar {
+    grid-template-columns: 1fr 350px;
+  }
+}
+
 /* Player Styles */
 .player-wrapper {
   position: relative;
