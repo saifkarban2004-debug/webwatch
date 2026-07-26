@@ -194,6 +194,11 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       });
     }
 
+    // Debugging ICE state
+    peer.oniceconnectionstatechange = () => {
+      console.log(`[WebRTC] ICE Connection State for ${targetUser}:`, peer.iceConnectionState);
+    };
+
     // Handle ICE candidates
     peer.onicecandidate = (event) => {
       if (event.candidate) {
@@ -203,6 +208,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
     // Handle incoming audio tracks
     peer.ontrack = (event) => {
+      console.log(`[WebRTC] Received remote track from ${targetUser}:`, event.track.kind);
       const remoteStream = event.streams[0];
       setRemoteStreams(prev => {
         const next = new Map(prev);
