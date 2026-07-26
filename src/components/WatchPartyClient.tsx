@@ -373,7 +373,8 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
         <audio 
           key={user} 
           autoPlay 
-          ref={el => { if (el) el.srcObject = stream; }} 
+          playsInline
+          ref={el => { if (el && el.srcObject !== stream) el.srcObject = stream; }} 
           style={{ display: 'none' }} 
         />
       ))}
