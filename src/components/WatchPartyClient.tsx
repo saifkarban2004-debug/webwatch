@@ -34,6 +34,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
 
   // WebRTC Voice State
   const [isVoiceJoined, setIsVoiceJoined] = useState(false);
+  const isVoiceJoinedRef = useRef(false);
   const [isMuted, setIsMuted] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
 
@@ -105,7 +106,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
         // If WE are already in voice, and a NEW user joins the channel, we initiate connection
-        if (isVoiceJoined && localStreamRef.current && newPresences.length > 0) {
+        if (isVoiceJoinedRef.current && localStreamRef.current && newPresences.length > 0) {
            const newUser = newPresences[0].user;
            if (newUser && newUser !== userName) {
               initiatePeerConnection(newUser);
@@ -121,6 +122,13 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
     room.on('broadcast', { event: 'webrtc_signaling' }, (payload) => {
       const { targetUser, fromUser, type, data } = payload.payload;
       
+      if (type === 'voice_joined') {
+         if (isVoiceJoinedRef.current && localStreamRef.current && fromUser !== userName) {
+            initiatePeerConnection(fromUser);
+         }
+         return;
+      }
+
       // Ignore messages not meant for us
       if (targetUser !== userName) return;
 
@@ -234,7 +242,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
   };
 
   const handleReceiveOffer = async (fromUser: string, offer: RTCSessionDescriptionInit) => {
-    if (!isVoiceJoined) return; // If we aren't in voice, ignore offers
+    if (!isVoiceJoinedRef.current) return; // If we aren't in voice, ignore offers
     
     const peer = peersRef.current.has(fromUser) 
       ? peersRef.current.get(fromUser)! 
@@ -290,6 +298,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       localStreamRef.current = stream;
       setIsVoiceJoined(true);
+      isVoiceJoinedRef.current = true;
       setIsMuted(false);
       
       // Connect to everyone already in the room
@@ -300,6 +309,13 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
            if (user && user !== userName) {
              initiatePeerConnection(user);
            }
+        });
+        
+        // Broadcast intent to everyone else in case they need to connect to us
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'webrtc_signaling',
+          payload: { targetUser: '*', fromUser: userName, type: 'voice_joined', data: null }
         });
       }
     } catch (err) {
@@ -315,6 +331,7 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       localStreamRef.current = null;
     }
     setIsVoiceJoined(false);
+    isVoiceJoinedRef.current = false;
     setIsMuted(false);
     
     // Close all peer connections
