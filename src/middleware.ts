@@ -11,13 +11,13 @@ export function middleware(request: NextRequest) {
 
   const csp = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://quge5.com https://*.quge5.com https://6opo.com https://*.6opo.com https://augpt.com https://*.augpt.com https://ckhay.com https://*.ckhay.com https://b3mny.com https://*.b3mny.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https://image.tmdb.org https://ui-avatars.com;
+    img-src 'self' blob: data: https:;
     media-src 'self' blob:;
-    frame-src 'self' https://vidsrc.net https://vidlink.pro https://embed.su https://multiembed.mov https://streamingnow.mov https://*.vidsrc.net https://*.vidlink.pro https://*.embed.su https://*.multiembed.mov https://*.streamingnow.mov https://6opo.com https://*.6opo.com https://augpt.com https://*.augpt.com https://ckhay.com https://*.ckhay.com https://b3mny.com https://*.b3mny.com;
-    font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com;
-    connect-src 'self' https://api.themoviedb.org https://*.supabase.co wss://*.supabase.co https://quge5.com https://*.quge5.com https://6opo.com https://*.6opo.com https://augpt.com https://*.augpt.com https://ckhay.com https://*.ckhay.com https://b3mny.com https://*.b3mny.com;
+    frame-src 'self' https:;
+    font-src 'self' data: https:;
+    connect-src 'self' wss://*.supabase.co https:;
   `.replace(/\s{2,}/g, ' ').trim();
 
   response.headers.set('Content-Security-Policy', csp);
