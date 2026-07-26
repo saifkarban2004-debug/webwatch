@@ -46,6 +46,8 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
   // WebRTC Refs
   const localStreamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<Map<string, RTCPeerConnection>>(new Map());
+  const dataChannelsRef = useRef<Map<string, RTCDataChannel>>(new Map());
+  const heartbeatIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // Generate a random name if not set
   useEffect(() => {
@@ -202,9 +204,33 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       });
     }
 
+    // Keep-alive DataChannel
+    const dataChannel = peer.createDataChannel('keepalive', { negotiated: true, id: 0 });
+    dataChannelsRef.current.set(targetUser, dataChannel);
+
+    const pingInterval = setInterval(() => {
+      if (dataChannel.readyState === 'open') {
+        dataChannel.send('ping');
+        console.log(`[WebRTC] Ping to ${targetUser}`);
+      }
+    }, 10000);
+    heartbeatIntervalsRef.current.set(targetUser, pingInterval);
+
     // Debugging ICE state
     peer.oniceconnectionstatechange = () => {
       console.log(`[WebRTC] ICE Connection State for ${targetUser}:`, peer.iceConnectionState);
+      if (peer.iceConnectionState === 'disconnected' || peer.iceConnectionState === 'failed') {
+        console.warn(`[WebRTC] ICE failed/disconnected for ${targetUser}. Triggering ICE Restart...`);
+        if (isVoiceJoinedRef.current) {
+           peer.createOffer({ iceRestart: true })
+             .then(offer => {
+                return peer.setLocalDescription(offer).then(() => {
+                   sendSignalingMessage(targetUser, 'offer', offer);
+                });
+             })
+             .catch(err => console.error('ICE Restart Offer Error:', err));
+        }
+      }
     };
 
     // Handle ICE candidates
@@ -286,6 +312,16 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
       peer.close();
       peersRef.current.delete(user);
     }
+    const interval = heartbeatIntervalsRef.current.get(user);
+    if (interval) {
+      clearInterval(interval);
+      heartbeatIntervalsRef.current.delete(user);
+    }
+    const dc = dataChannelsRef.current.get(user);
+    if (dc) {
+      dc.close();
+      dataChannelsRef.current.delete(user);
+    }
     setRemoteStreams(prev => {
       const next = new Map(prev);
       next.delete(user);
@@ -337,6 +373,15 @@ export default function WatchPartyClient({ roomId }: WatchPartyClientProps) {
     // Close all peer connections
     peersRef.current.forEach(peer => peer.close());
     peersRef.current.clear();
+    
+    // Clear intervals
+    heartbeatIntervalsRef.current.forEach(interval => clearInterval(interval));
+    heartbeatIntervalsRef.current.clear();
+    
+    // Close DataChannels
+    dataChannelsRef.current.forEach(dc => dc.close());
+    dataChannelsRef.current.clear();
+
     setRemoteStreams(new Map());
   };
 
