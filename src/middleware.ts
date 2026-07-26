@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), display-capture=()');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=(), display-capture=()');
 
   const csp = `
     default-src 'self';
